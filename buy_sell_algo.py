@@ -1,3 +1,21 @@
+"""
+You're given:
+- An array prices[0..n-1]
+- A binary array algo[0..n-1], where algo[i] = 0 means a buy (so you subtract prices[i] from revenue) and algo[i] = 1 means a sell (so you add prices[i] to revenue)
+- An integer k
+
+You are allowed to pick a consecutive subarray of length k (say from i to i+k-1) and force all their corresponding algo[j] to be 1 (i.e. make them all sells). You want to choose the position of that length-k block to maximize the total revenue (overall, with those changes applied).
+
+Example:
+prices = [5, 3, 8, 2, 6, 4]
+algo   = [1, 0, 0, 1, 0, 1]
+k = 3
+
+base revenue = +5-3-8+2-6+4 = -6
+
+Answer = 22
+You'd choose window starting at index 2 (positions 2,3,4) to force those algos to sell; revenue = 22
+"""
 
 import numpy as np
 
