@@ -18,6 +18,7 @@ You'd choose window starting at index 2 (positions 2,3,4) to force those algos t
 """
 
 import numpy as np
+from collections import deque
 
 def calculate_revenue(prices, algo, k):
     revenue = 0
@@ -29,23 +30,38 @@ def calculate_revenue(prices, algo, k):
     return income - expense
 
 def calculate_override_index(prices, algo, k):
-    n = len(prices)
+    prices_copy = prices.copy()
+    n = len(prices_copy)
     max_profit = 0
     override_index = 0
 
-    for i in range(n-k):
-        algo_sub = algo[i:i+k]
+    # Transform prices so that sells are 0, buys remain unchanged
+    for i in range(n):
+        if algo[i] == 1:
+            prices_copy[i] = 0
 
-        if 0 in algo_sub:
-            prices_sub = prices[i:i+k]
-            additional_profit = np.sum(prices_sub * (1-algo_sub))
+    # Create and populate queue
+    my_queue = deque()
+    my_queue.extend(prices_copy[:k])
+    current_sum = sum(my_queue)
 
-            if additional_profit > max_profit:
-                max_profit = additional_profit
-                override_index = i
+    for i in range(k, n):
+        my_queue.popleft()
+        my_queue.append(prices_copy[i])
+
+        current_sum = sum(my_queue)
+        if current_sum > max_profit:
+            max_profit = current_sum
+            override_index = i - k + 1
 
     return override_index
 
+# Test 1
+# prices = np.array([5, 3, 8, 2, 6, 4])
+# algo = np.array([1, 0, 0, 1, 0, 1])
+# k = 3
+
+# Test 2
 prices = np.array([5, 3, 8, 2, 6, 4, 9, 2, 3, 7])
 algo   = np.array([1, 0, 0, 1, 0, 1, 0, 1, 0, 0])
 k = 3
@@ -54,8 +70,8 @@ print(f"Prices:    {prices}")
 print(f"Algorithm: {algo}")
 print(f"Window Size (k): {k}")
 
-baseline_profit = calculate_revenue(prices, algo, k)
-print(f"Baseline Profit: {baseline_profit}")
+baseline_revenue = calculate_revenue(prices, algo, k)
+print(f"Baseline Revenue: {baseline_revenue}")
 
 override_index = calculate_override_index(prices, algo, k)
 print(f"Override Index: {override_index}")
@@ -64,5 +80,5 @@ revised_algo = algo.copy()
 revised_algo[override_index:override_index+k] = 1
 print(f"Revised Algorithm: {revised_algo}")
 
-potential_profit = calculate_revenue(prices, revised_algo, k)
-print(f"Potential Profit after Override: {potential_profit}")
+potential_revenue = calculate_revenue(prices, revised_algo, k)
+print(f"Potential Revenue after Override: {potential_revenue}")
